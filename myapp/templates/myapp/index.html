@@ -76,4 +76,49 @@
     <h1 class="ml-10 my-5 text-2xl text-green-500 font-bold">{{ weekly_sum|intcomma }}</h1>
   </div>
 </div>
+
+<div class="flex">
+  <div class="w-1/2 shadow-lg ml-10">
+    <h1>Expense spread across categories</h1>
+    <canvas id="cat-can" class="m-10"></canvas>
+  </div>
+  <div class="w-1/2 shadow-lg ml-10">
+
+
+  </div>
+</div>
 {% endblock content %}
+
+{% block custom_scripts %}
+<script>
+  const exp = {{ categorical_expenses|striptags|safe }};
+  console.log(exp);
+  const data = {
+    labels: Object.keys(exp),
+    datasets: [{
+      label: 'Category wise expense',
+      data: Object.values(exp),
+      backgroundColor: [
+        'rgba(255, 99, 132)',
+        'rgba(255, 159, 64)',
+      ],
+      borderColor: [
+        'rgb(255, 99, 132)',
+        'rgb(255, 159, 64)',
+      ],
+      borderWidth: 1
+    }]
+  };
+
+
+
+  const config = {
+    type: 'pie',
+    data: data
+  };
+
+
+  const ctx = document.getElementById("cat-can");
+  const char = new Chart(ctx, config)
+</script>
+{% endblock custom_scripts %}

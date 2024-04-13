@@ -1,6 +1,8 @@
 import datetime
-from django.shortcuts import redirect, render
+import json
+
 from django.db.models import Sum
+from django.shortcuts import redirect, render
 
 from .forms import ExpenseForm
 from .models import Expense
@@ -27,11 +29,10 @@ def index(request):
     )
 
     categorical_expenses = (
-        Expense.objects
-        .values("category")
+        Expense.objects.values("category")
         .order_by("category")
-        .annotate(amount=Sum('amount'))
-    )
+        .annotate(amount=Sum("amount"))
+    ).values("category", "amount")
     print(daily_sums)
     print(categorical_expenses)
     context = {
@@ -47,6 +48,9 @@ def index(request):
         "weekly_sum": expenses.filter(date_created__date__gte=get_date(7)).aggregate(
             sum=Sum("amount")
         )["sum"],
+        "categorical_expenses": {
+            x["category"]: x["amount"] for x in categorical_expenses
+        },
     }
     print(context)
     return render(request, "myapp/index.html", context)
